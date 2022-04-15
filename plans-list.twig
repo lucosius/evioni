@@ -62,7 +62,7 @@
       {% for colourOption in colours %}
 <div class="column is-6">
         <label>
-          <input sprig type="radio" name="colour" value="{{ colourOption.id }}" {{ colour == colourOption.id ? 'checked' }}>
+          <input sprig type="radio" name="{{ tabas }}-colour" value="{{ colourOption.id }}" {{ colour == colourOption.id ? 'checked' }}>
           <p id="colour-label selectbtn">
             {{ colourOption.title }}
           </p>
@@ -80,7 +80,7 @@
       {% for lengthOption in lengths %}
       <div class="column is-6">
         <label>
-          <input sprig type="radio" name="length" value="{{ lengthOption.id }}" {{ length == lengthOption.id ? 'checked' }}>
+          <input sprig type="radio" name="{{ tabas }}-length" value="{{ lengthOption.id }}" {{ length == lengthOption.id ? 'checked' }}>
           <p id="length-label">
             {{ lengthOption.title }}
           </p>
