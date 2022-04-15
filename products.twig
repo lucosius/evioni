@@ -1,0 +1,105 @@
+{% set ats = craft.entries.id(entryId).all() %}
+{% set elite = craft.categories.group('plan_type').slug('elite') %}
+{% set premium = craft.categories.group('plan_type').slug('premium') %}
+{% set basic = craft.categories.group('plan_type').slug('basic') %}
+{% set tabas = tabas ?? _planTabs %}
+{% set eliteplan = craft.products()
+  .type('plans')
+  .relatedTo ([
+        'and',
+        { targetElement: ats },
+        { targetElement: elite }
+    ])
+  .limit(1)
+  .all() %}
+  {% set premiumplan = craft.products()
+  .type('plans')
+  .relatedTo ([
+        'and',
+        { targetElement: ats },
+        { targetElement: premium }
+    ])
+  .limit(1)
+  .all() %}
+    {% set basicplan = craft.products()
+  .type('plans')
+  .relatedTo ([
+        'and',
+        { targetElement: ats },
+        { targetElement: basic }
+    ])
+  .limit(1)
+  .all() %}
+
+   <div class="columns pt-2 pb-2 mb-0">
+    <div class="column is-8 is-offset-2">
+      <div class="columns is-variable is-5">
+       <div class="column is-one-third">
+        <div sprig class="bandau columns is-multiline is-elite-button {{ tabas == _planTabs? 'is-elite-button-active' }} px-3">
+          <div class="column is-12 has-text-centered has-border-elite">
+           <span class="evioni-icon">Elite</span>
+          </div>
+          <div class="column is-7">
+       {% for product in eliteplan %}
+              {% set price = product.defaultVariant.salePrice / 24 %}
+        <span class="is-size-4 has-text-weight-normal">{{ price|number(decimals=2) }} </span><span class="is-size-7">€/mėn.</span>
+          </div>
+           <div class="column is-5 has-text-right">
+           <span class="is-size-4 has-text-weight-normal">{{ product.defaultVariant.salePrice }}</span><span class="is-size-7">€</span>
+           {% endfor %}
+          </div>
+        </div>
+          </div>
+       <div class="column is-one-third">
+               <div sprig s-val:tabas="elite" class="bandau columns is-multiline is-premium-button {{ tabas == 'elite' ? 'is-premium-button-active' }} px-3">
+          <div class="column is-12 has-text-centered has-border-premium">
+             <span class="evioni-icon">Premium</span>
+          </div>
+          <div class="column is-7">
+              {% for product in premiumplan %}
+              {% set price = product.defaultVariant.salePrice / 24 %}
+        <span class="is-size-4 has-text-weight-normal">{{ price|number(decimals=2) }} </span><span class="is-size-7">€/mėn.</span>
+          </div>
+           <div class="column is-5 has-text-right">
+           <span class="is-size-4 has-text-weight-normal">{{ product.defaultVariant.salePrice }}</span><span class="is-size-7">€</span>
+           {% endfor %}
+          </div>
+        </div>
+      </div>
+ <div class="column is-one-third">
+         <div sprig s-val:tabas="premium" class="bandau columns is-multiline is-basic-button {{ tabas == 'premium' ? 'is-basic-button-active' }} px-3">
+          <div class="column is-12 has-text-centered has-border-basic">
+             <span class="evioni-icon">Basic</span>
+          </div>
+         <div class="column is-7">
+        {% for product in basicplan %}
+              {% set price = product.defaultVariant.salePrice / 24 %}
+        <span class="is-size-4 has-text-weight-normal">{{ price|number(decimals=2) }} </span><span class="is-size-7">€/mėn.</span>
+          </div>
+           <div class="column is-5 has-text-right">
+           <span class="is-size-4 has-text-weight-normal">{{ product.defaultVariant.salePrice }}</span><span class="is-size-7">€</span>
+           {% endfor %}
+          </div>
+        </div>
+      </div>
+</div>
+</div>
+</div>
+
+{% if tabas == _planTabs %}
+  {% for product in eliteplan %}
+ {% include 'database/solutions/plans-list.twig' %}
+  {% endfor %}
+{% endif %}
+
+{% if tabas == 'elite' %}
+  {% for product in premiumplan %}
+ {% include 'database/solutions/plans-list.twig' %}
+  {% endfor %}
+{% endif %}
+
+{% if tabas == 'premium' %}
+  {% for product in basicplan %}
+ {% include 'database/solutions/plans-list.twig' %}
+  {% endfor %}
+{% endif %}
