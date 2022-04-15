@@ -2,7 +2,8 @@
 {% set elite = craft.categories.group('plan_type').slug('elite') %}
 {% set premium = craft.categories.group('plan_type').slug('premium') %}
 {% set basic = craft.categories.group('plan_type').slug('basic') %}
-{% set tabas = tabas ?? _planTabs %}
+{% set tabas = tabas ?? '' %}
+{{ hiddenInput('tabas', tabas) }}
 {% set eliteplan = craft.products()
   .type('plans')
   .relatedTo ([
@@ -35,7 +36,7 @@
     <div class="column is-8 is-offset-2">
       <div class="columns is-variable is-5">
        <div class="column is-one-third">
-        <div sprig class="bandau columns is-multiline is-elite-button {{ tabas == _planTabs? 'is-elite-button-active' }} px-3">
+        <div sprig s-val:tabas="elite" class="bandau columns is-multiline is-elite-button {{ tabas == 'elite' ? 'is-premium-button-active' }} px-3">
           <div class="column is-12 has-text-centered has-border-elite">
            <span class="evioni-icon">Elite</span>
           </div>
@@ -51,7 +52,7 @@
         </div>
           </div>
        <div class="column is-one-third">
-               <div sprig s-val:tabas="elite" class="bandau columns is-multiline is-premium-button {{ tabas == 'elite' ? 'is-premium-button-active' }} px-3">
+               <div sprig s-val:tabas="premium" class="bandau columns is-multiline is-premium-button {{ tabas == 'premium' ? 'is-premium-button-active' }} px-3">
           <div class="column is-12 has-text-centered has-border-premium">
              <span class="evioni-icon">Premium</span>
           </div>
@@ -67,7 +68,7 @@
         </div>
       </div>
  <div class="column is-one-third">
-         <div sprig s-val:tabas="premium" class="bandau columns is-multiline is-basic-button {{ tabas == 'premium' ? 'is-basic-button-active' }} px-3">
+         <div sprig s-val:tabas="basic" class="bandau columns is-multiline is-basic-button {{ tabas == 'basic' ? 'is-basic-button-active' }} px-3">
           <div class="column is-12 has-text-centered has-border-basic">
              <span class="evioni-icon">Basic</span>
           </div>
@@ -85,20 +86,19 @@
 </div>
 </div>
 </div>
-
-{% if tabas == _planTabs %}
-  {% for product in eliteplan %}
- {% include 'database/solutions/plans-list.twig' %}
-  {% endfor %}
-{% endif %}
-
 {% if tabas == 'elite' %}
-  {% for product in premiumplan %}
+    {% for product in eliteplan %}
  {% include 'database/solutions/plans-list.twig' %}
   {% endfor %}
 {% endif %}
 
 {% if tabas == 'premium' %}
+{% for product in premiumplan %}
+ {% include 'database/solutions/plans-list.twig' %}
+  {% endfor %}
+{% endif %}
+
+{% if tabas == 'basic' %}
   {% for product in basicplan %}
  {% include 'database/solutions/plans-list.twig' %}
   {% endfor %}
