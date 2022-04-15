@@ -1,0 +1,151 @@
+<div class="columns is-mobile pt-5 mb-5">
+<div class="column is-6 is-offset-3 has-text-centered">
+ <h3 class="subtitle is-size-6 is-uppercase mb-1 has-text-weight-normal">{% for plan_type in product.plan_type.all() %} {{ plan_type }} {% endfor %} stotelė + montavimas</h3>
+ <h4 class="subtitle is-size-2 has-text-black">{{ product.title|title }}</h4>
+</div>
+</div>
+
+               <div class="columns is-multiline">
+          <div class="column is-4 is-offset-2 pl-0 pr-5">
+{% for image in product.product_picture.limit(1).all() %}
+                    <figure class="image">
+      <img class="is-evioni-shop-image" src="{{ image.url('gallery_big') }}">
+     {% for plan_type in product.plan_type.all() %} <span class="badge has-{{ plan_type }}"> {{ plan_type }} </span>{% endfor %}
+    </figure>
+                     {% endfor %}
+                      </div>
+          <div class="column is-4 pr-0">
+            {% if product.plan_advantages|length %}
+<h4 class="has-border-top has-border-bottom py-3 is-size-4 is-filter-heading mb-3">{% for plan_type in product.plan_type.all() %} {{ plan_type }} {% endfor %} plano privalumai</h4>
+<ul class="is-plans-advantages has-text-black ml-5 mb-4">
+{% for row in product.plan_advantages %}
+<li class="pb-2">{{ row.privalumai }}</li>
+{% endfor %}
+ </ul>
+{% endif %}
+
+       {% if product.plan_advantages|length %}
+<h4 class="has-border-top has-border-bottom py-3 is-size-4 is-filter-heading mb-3">Evioni pasirūpins</h4>
+<div class="columns is-multiline mb-5 mt-0">
+{% for block in product.take_care.all() %}
+<div class="column is-6 has-text-centered py-0 mb-3">
+  <span class="icon has-text-black is-size-1 has-text-weight-bold">
+{{ block.ikona }}
+</span>
+{{ block.text }}
+</div>
+{% endfor %}
+</div>
+{% endif %}
+
+{% set colour = colour ?? [] %}
+{% set length = length ?? [] %}
+{% set addedToCart = success is defined %}
+{% set colours = craft.categories().group('spalva').relatedTo(product.Id).all() %}
+{% set lengths = craft.categories().group('ilgis').relatedTo(product.Id).all() %}
+{% set variantQuery = craft.variants().productId(product.Id) %}
+{% if colour %}
+    {% do variantQuery.andRelatedTo(colour) %}
+{% endif %}
+{% if length %}
+    {% do variantQuery.andRelatedTo(length) %}
+{% endif %}
+
+{% do variantQuery %}
+{% set variants = variantQuery.all() %}
+
+<form sprig s-method="post" s-action="commerce/cart/update-cart">
+  <input type="hidden" name="qty" value="1">
+  <fieldset>
+ <p class="is-size-4 has-text-black mb-3">Pasirinkite stotelės spalvą</p>
+           <div class="columns is-multiline">
+      {% for colourOption in colours %}
+<div class="column is-6">
+        <label>
+          <input sprig type="radio" name="colour" value="{{ colourOption.id }}" {{ colour == colourOption.id ? 'checked' }}>
+          <p id="colour-label selectbtn">
+            {{ colourOption.title }}
+          </p>
+          <span class="{{ colour == colourOption.id ? "has-text-primary" : "has-text-white" }}"></span>
+        </label>
+    </div>
+      {% endfor %}
+  </div>
+  </fieldset>
+
+    <fieldset>
+    <p class="is-size-4 has-text-black">Parinkome laido ilgį</p>
+                        <p class="is-size-7 has-text-black mb-3">Į plana įskaičiuotas 5m integruotas laidas (už papildomą mokestį galima pasirinkti ilgesnį).</p>
+           <div class="columns is-multiline">
+      {% for lengthOption in lengths %}
+      <div class="column is-6">
+        <label>
+          <input sprig type="radio" name="length" value="{{ lengthOption.id }}" {{ length == lengthOption.id ? 'checked' }}>
+          <p id="length-label">
+            {{ lengthOption.title }}
+          </p>
+          <span class="{{ lengthOption.slug }} {{ length == lengthOption.id ? "ring-4 ring-gold-500" : "ring-2 ring-gray-200" }}"></span>
+        </label>
+           </div>
+      {% endfor %}
+    </div>
+  </fieldset>
+  <fieldset class="mb-8">
+    {% if colour and length %}
+    {% for variant in variants %}
+      <div class="columns is-multiline has-border pt-3 pb-3 mt-5 has-text-black">
+<div class="column is-half">
+   {% set price = variant.price / 24 %}
+<p class="mb-2"><span data-variant-price-full class="is-size-5 has-text-weight-normal">{{ price|number(decimals=2) }}</span><span class="is-size-7"> €/mėn.</span></p>
+<p class="is-size-7">Sutartis 24 mėn<br/>
+Pradinė įmoka 0 €</p>
+</div>
+<div class="column is-half has-text-right">
+    <span class="is-size-5 has-text-weight-normal"><span data-variant-price-full>{{ variant.salePrice }}</span></span><span class="is-size-7"> €</span>
+</div>
+          </div>
+           <input style="display: none!important" type="radio" name="purchasableId" value="{{ variant.id }}" checked>
+    {% endfor %}
+
+             <div class="columns mt-5">
+            <div class="column is-12">
+  <button type="submit" class="button is-fullwidth is-cart">Pridėti į mano krepšelį</button>
+</div>
+</div>
+ <div class="columns mt-5">
+            <div class="column is-12">
+ {% if addedToCart and success %}
+    was added to your cart!
+  {% endif %}
+  </div>
+</div>
+    {% else %}
+    {% set products = craft.products()
+  .id(product.id)
+  .all() %}
+{% for product in products %}
+
+    {% set price = product.defaultVariant.salePrice / 24 %}
+      <div class="columns is-multiline has-border pt-3 pb-3 mt-5 has-text-black">
+<div class="column is-half">
+<p class="mb-2"><span data-variant-price-full class="is-size-5 has-text-weight-normal">{{ price|number(decimals=2) }}</span><span class="is-size-7"> €/mėn.</span></p>
+<p class="is-size-7">Sutartis 24 mėn<br/>
+Pradinė įmoka 0 €</p>
+</div>
+<div class="column is-half has-text-right">
+    <span class="is-size-5 has-text-weight-normal"><span data-variant-price-full>{{ product.defaultVariant.salePrice }}</span></span><span class="is-size-7"> €</span>
+</div>
+          </div>
+{% endfor %}
+    {% endif %}
+  </fieldset>
+</form>
+      </div>
+      </div>
+
+
+<section class="section pt-4 pb-0">
+  <div class="container">
+        {{ sprig('database/solutions/plans-tabs.twig', {'_productTabs': 'description, specifications', 'productId': product.id }) }}
+</div>
+</section>
